@@ -27,7 +27,6 @@ def serial_ports():
 
     result = []
 
-    #TODO validar que quien responde es un SCK
     for port in ports:
         try:
             s = serial.Serial(port)
@@ -71,19 +70,19 @@ sensors = [
 ]
 #####################################################################
 
-# VARIABLES DE COMPORTAMIENTO
+# BEHAVIOUR VARIABLES
 sampleNumber = 1000
 minPlot = 0;
 manualY = False;
 lastManualY = False;
 maxY = 100;
 
-#variables para menjo del puerto serial
+# serial port variables
 port = serial.Serial(serial_ports()[0], 230400)
 serialLine = ""
 
-# Variables para actualizar los textos solo cuando pasa textRefreshTime (si no van muy rapido como para leerlos)
-textRefreshTime = 0.5		# segundos
+# Variables related to data text display
+textRefreshTime = 0.5		# seconds
 textTimer = time.time()
 TextAverageCounter = 0
 
@@ -128,7 +127,6 @@ if not os.path.exists(logFileName):
 		if sensor.logValue:
 			line2Write = line2Write + "," + sensor.name
 	line2Write = line2Write + "\n"
-	# print line2Write
 	logFile.write(line2Write)
 	logFile.close()
 else:
@@ -189,7 +187,7 @@ def remapVertical(dataSet):
 		for val in dataSet:
 			newList.append((((float(val) - in_min) * (maxY - minPlot))/(in_max - in_min)) + minPlot)
 	else:
-		return dataSet  #aqui hay que reducir el valor de los que no cambian a menos de 100 (dividirlo entre 10 hasta que sea menor que 100)
+		return dataSet
 	return newList
 
 def animate(ix):
