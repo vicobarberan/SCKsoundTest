@@ -236,15 +236,19 @@ def animate(ix):
 			else:
 				formatedValue = str(averagedValues)
 			sensor.text.set_text(sensor.name + ":  " + formatedValue + " " + sensor.unit + extraText)
-		if sensor.logValue and updateTextAndLog:
-			valuesToLog.append(str(averagedValues))
+		# if sensor.logValue and updateTextAndLog:
+			# valuesToLog.append(str(averagedValues))
+		if sensor.logValue:
+			valuesToLog.append(str(serialLine[i]))
 			
 		i = i + 1
 
 
 	if updateTextAndLog: 
-		logCSV(valuesToLog)
+		# logCSV(valuesToLog)
 		TextAverageCounter = 0
+
+	logCSV(valuesToLog)
 
 	return lines + texts
 
