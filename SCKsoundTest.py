@@ -235,6 +235,7 @@ def animate(ix):
 				formatedValue =  str(int(averagedValues))
 			else:
 				formatedValue = str(averagedValues)
+			sensor.text.set_text("")
 			sensor.text.set_text(sensor.name + ":  " + formatedValue + " " + sensor.unit + extraText)
 		# if sensor.logValue and updateTextAndLog:
 			# valuesToLog.append(str(averagedValues))
