@@ -190,6 +190,22 @@ def remapVertical(dataSet):
 		return dataSet
 	return newList
 
+def validateLine(line):
+
+	line = line.strip('\t\n\r')
+	if ',' in line:
+		line = line.split(',')
+		if len(line) == len(sensors):
+			for value in line:
+				try:
+					float(value)
+				except:
+					return False
+			return line
+
+	return False
+
+
 def animate(ix):
 	global textTimer
 	global manualY
@@ -203,53 +219,57 @@ def animate(ix):
 		updateTextAndLog = False
 		TextAverageCounter = TextAverageCounter + 1
 	
-	serialLine = port.readline().strip('\t\n\r').split(',')
-	valuesToLog = []
+	serialLine = validateLine(port.readline())
 
-	i = 0
-	for sensor in sensors:
-		sensor.dataSet.pop(0)
-		sensor.dataSet.append(float(serialLine[i]))
-		if sensor.displayPlot:
-			if (manualY):
-				sensor.plot[0].set_ydata(sensor.dataSet)
-			else:
-				sensor.plot[0].set_ydata(remapVertical(sensor.dataSet))
-		if sensor.displayText and updateTextAndLog:
-			if len(sensor.keys) > 0:
-				extraText = ' ['
-				nn = 0
-				for k in sensor.keys:
-					extraText = extraText + k 
-					if nn < len(sensor.keys) - 1:
-						extraText = extraText + ','
-					nn = nn + 1
-				extraText = extraText + ']'
-			else:
-				extraText = ''
+	if serialLine:
 
-			parcialValues  = sensor.dataSet[(-1 * TextAverageCounter):]
-			averagedValues = round(sum(parcialValues)/float(len(parcialValues)), sensor.decNum)
+		valuesToLog = []
 
-			if sensor.decNum == 0:
-				formatedValue =  str(int(averagedValues))
-			else:
-				formatedValue = str(averagedValues)
-			sensor.text.set_text("")
-			sensor.text.set_text(sensor.name + ":  " + formatedValue + " " + sensor.unit + extraText)
-		# if sensor.logValue and updateTextAndLog:
-			# valuesToLog.append(str(averagedValues))
-		if sensor.logValue:
-			valuesToLog.append(str(serialLine[i]))
-			
-		i = i + 1
+		i = 0
+		for sensor in sensors:
+			sensor.dataSet.pop(0)
+			sensor.dataSet.append(float(serialLine[i]))
+			if sensor.displayPlot:
+				if (manualY):
+					sensor.plot[0].set_ydata(sensor.dataSet)
+				else:
+					sensor.plot[0].set_ydata(remapVertical(sensor.dataSet))
+			if sensor.displayText and updateTextAndLog:
+				if len(sensor.keys) > 0:
+					extraText = ' ['
+					nn = 0
+					for k in sensor.keys:
+						extraText = extraText + k 
+						if nn < len(sensor.keys) - 1:
+							extraText = extraText + ','
+						nn = nn + 1
+					extraText = extraText + ']'
+				else:
+					extraText = ''
+
+				parcialValues  = sensor.dataSet[(-1 * TextAverageCounter):]
+				averagedValues = round(sum(parcialValues)/float(len(parcialValues)), sensor.decNum)
+
+				if sensor.decNum == 0:
+					formatedValue =  str(int(averagedValues))
+				else:
+					formatedValue = str(averagedValues)
+				sensor.text.set_text("")
+				sensor.text.set_text(sensor.name + ":  " + formatedValue + " " + sensor.unit + extraText)
+			if sensor.logValue:
+				valuesToLog.append(str(serialLine[i]))
+				
+			i = i + 1
 
 
-	if updateTextAndLog: 
-		# logCSV(valuesToLog)
-		TextAverageCounter = 0
+		if updateTextAndLog: 
+			TextAverageCounter = 0
 
-	logCSV(valuesToLog)
+		logCSV(valuesToLog)
+	else:
+		for sensor in sensors:
+			sensor.dataSet.append(0.0)
+			sensor.text.set_text(sensor.name + ":  null")
 
 	return lines + texts
 
